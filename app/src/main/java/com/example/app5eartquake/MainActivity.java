@@ -1,6 +1,7 @@
 package com.example.app5eartquake;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
@@ -10,8 +11,6 @@ import android.widget.Toast;
 
 import com.example.app5eartquake.databinding.ActivityMainBinding;
 
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -20,13 +19,9 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        MainViewModel viewModel= new ViewModelProvider(this).get(MainViewModel.class);
+
         binding.eqRecycler.setLayoutManager(new LinearLayoutManager(this));
-        ArrayList<Earthquake> eqlist= new ArrayList<>();
-        eqlist.add(new Earthquake("001", "Carchi-Tulcan",5, 12082022, 100.5,198.3  ));
-        eqlist.add(new Earthquake("002", "Guayas-Guayaquil",6, 12082022, 100.5,154.8  ));
-        eqlist.add(new Earthquake("003", "Chimborazo- Alusi",3, 12082022, 100.5,154.8  ));
-        eqlist.add(new Earthquake("004", "Azuay-Cuenca",1, 12082022, 100.5,154.8  ));
-        eqlist.add(new Earthquake("005", "Azuay-Paute",4.3, 12082022, 100.5,154.8  ));
 
 
         //Carga de datos
@@ -36,15 +31,24 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
         binding.eqRecycler.setAdapter(adapter);
-        adapter.submitList(eqlist);
 
-        if(eqlist.isEmpty()){
-            binding.emptyView.setVisibility(View.VISIBLE);
-        }else{
-            binding.emptyView.setVisibility(View.GONE);
 
-        }
+
+
+        viewModel.getEqList().observe(this,eqList ->{
+            adapter.submitList(eqList);
+
+            if(eqList.isEmpty()){
+                binding.emptyView.setVisibility(View.VISIBLE);
+            }else{
+                binding.emptyView.setVisibility(View.GONE);
+
+            }
+        });
+        viewModel.getEarthquakes();
 
     }
     public void abrir(String id, String place, double magnitude, long time, double lat, double longi){
